@@ -195,21 +195,45 @@ int sum(int a, int b, int c, int d){//Return the sum of a, b, c and d
 /*PRJ2*/
 //11.12 형준
 bool create (const char *file, unsigned initial_size){
-  if(!file)
+  if(!file) //create-null
     exit(-1);
-  if(!is_user_vaddr(file))
+  if(!is_user_vaddr(file))//create-bad-ptr
     exit(-1);
   return filesys_create(file,initial_size);
 }
 bool remove (const char *file){
-  if(!file)
+ /* if(!file)
     exit(-1);
   if(!is_user_vaddr(file))
-    exit(-1);
+    exit(-1);*/
   return filesys_remove(file);
 }
 int open (const char *file){
+  struct file* fp;
+  int ret =-1;
+  int idx =3;
 
+  if(!file) //open-null
+    exit(-1);
+  if(!is_user_vaddr(file))//open-bad-ptr
+    exit(-1);
+  fp = filesys_open(file);
+  if(fp==NULL){//open-empty
+    return ret; //수정합시다. inseok
+  }
+  else{//open normal
+    idx = 3;
+    while(idx<128){
+      if(thread_current()->fd[idx]==NULL)
+      break;
+      idx++;
+    }
+    thread_current()->fd[idx] = fp;
+    return idx; //return fd
+  }
+
+  return -1;
+ 
 }
 int filesize (int fd){
   
