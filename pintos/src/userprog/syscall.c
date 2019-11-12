@@ -143,18 +143,25 @@ void halt(void){
 }
 
 void exit(int status){
+  int idx=3;
   struct thread *current_t = thread_current();
   current_t -> exit_status = status;//success.  (nonzero == fail to exit)
   printf("%s: exit(%d)\n", thread_name(), status);
+  while(idx<128){
+      if(current_t->fd[idx])
+        close(idx);
+      idx++;
+  }
+
   thread_exit();
 }
-int write(int fd, const void *buffer, unsigned size){
+int write(int fd, const void *buffer, unsigned size){//11.12 수정필요
   if(fd == 1){
     putbuf(buffer,size);
   }
   return (int)size;
 }
-int read(int fd, void* buffer, unsigned size){
+int read(int fd, void* buffer, unsigned size){//11.12 수정필요
   int i=0;
   uint8_t check;
   if(fd ==0){
@@ -202,10 +209,12 @@ bool create (const char *file, unsigned initial_size){
   return filesys_create(file,initial_size);
 }
 bool remove (const char *file){
- /* if(!file)
+  /* 11.12 삭제예정
+  if(!file)
     exit(-1);
   if(!is_user_vaddr(file))
-    exit(-1);*/
+    exit(-1);
+  */
   return filesys_remove(file);
 }
 int open (const char *file){
@@ -233,18 +242,45 @@ int open (const char *file){
   }
 
   return -1;
- 
 }
 int filesize (int fd){
+  if(thread_current()->fd[fd]){
+    return file_length(thread_current()->fd[fd]);
+  }
+  else
+  {
+    exit(-1);
+  }
   
 }
 void seek (int fd, unsigned position){
-
+  
+  if(thread_current()->fd[fd]){
+    file_seek(thread_current()->fd[fd],position);
+  }
+  else
+  {
+    exit(-1);
+  }
 }
 unsigned tell (int fd){
-
+  
+  if(thread_current()->fd[fd]){
+    return file_tell(thread_current()->fd[fd]);
+  }
+  else
+  {
+    exit(-1);
+  }
 }
 void close (int fd){
-
+  
+  if(thread_current()->fd[fd]){
+    return file_close(thread_current()->fd[fd]);
+  }
+  else
+  {
+    exit(-1);
+  }
 }
 /**/
