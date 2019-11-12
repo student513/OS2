@@ -56,17 +56,36 @@ syscall_handler (struct intr_frame *f UNUSED)
       else{
         f->eax = wait((pid_t)*(uint32_t *)(f->esp + 4));
       }
-     
-      
       break;
+
+
+    //형준 11.12
     case SYS_CREATE://prj2
+      if(is_user_vaddr(f->esp+4)&&is_user_vaddr(f->esp+8))
+        f->eax = create((const char *)*(uint32_t *)(f->esp+4),(unsigned)*(uint32_t *)(f->esp+8));
+      else
+        exit(-1);
       break;
     case SYS_REMOVE://prj2
+      if(!is_user_vaddr(f->esp+4))
+        exit(-1);
+      else
+        f->eax = remove((const char*)*(uint32_t *)(f->esp+4));
       break;
     case SYS_OPEN://prj2
+      if(!is_user_vaddr(f->esp+4))
+        exit(-1);
+      else 
+        f->eax = open((const char*)*(uint32_t *)(f->esp+4));
       break;
     case SYS_FILESIZE://prj2
+      if(!is_user_vaddr(f->esp+4))
+        exit(-1);
+      else
+        f->eax = filesize((int)*(uint32_t *)(f->esp+4));
       break;
+    //
+    
     case SYS_READ://
       if(!is_user_vaddr(f->esp + 4)){exit(-1);}
       else if(!is_user_vaddr(f->esp + 8)){exit(-1);}
@@ -79,12 +98,28 @@ syscall_handler (struct intr_frame *f UNUSED)
       
       f->eax = write((int)*(uint32_t *)(temp_esp+4),(void*)*(uint32_t *)(temp_esp+8),(unsigned)*(uint32_t *)(temp_esp+12));
       break;
+
+    //11.12 형준
     case SYS_SEEK://prj2
+      if(is_user_vaddr(f->esp+4)&&is_user_vaddr(f->esp+8))
+        seek((int)*(uint32_t *)(f->esp+4),(unsigned)*(uint32_t *)(f->esp+8));
+      else
+        exit(-1);
       break;
     case SYS_TELL://prj2
+      if(!is_user_vaddr(f->esp+4))
+        exit(-1);
+      else
+        f->eax=tell((int)*(uint32_t *)(f->esp+4));
       break;
     case SYS_CLOSE://prj2
+      if(!is_user_vaddr(f->esp+4))
+        exit(-1);
+      else 
+        close((int)*(uint32_t *)(f->esp+4));
       break;
+    //
+
       /*191102 inseok*/
     case SYS_FIBONACCI:
       //if(!is_user_vaddr(f->esp + 4)){exit(-1);}
@@ -156,3 +191,26 @@ int sum(int a, int b, int c, int d){//Return the sum of a, b, c and d
   return a+b+c+d;
 }
 /**/
+
+//11.12 형준
+bool create (const char *file, unsigned initial_size){
+
+}
+bool remove (const char *file){
+
+}
+int open (const char *file){
+
+}
+int filesize (int fd){
+
+}
+void seek (int fd, unsigned position){
+
+}
+unsigned tell (int fd){
+
+}
+void close (int fd){
+
+}
