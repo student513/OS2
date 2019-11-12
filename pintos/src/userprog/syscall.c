@@ -211,6 +211,13 @@ int open (const char *file){
 
 }
 int filesize (int fd){
+  if(thread_current()->fd[fd]){
+    return file_length(thread_current()->fd[fd]);
+  }
+  else
+  {
+    exit(-1);
+  }
   
 }
 void seek (int fd, unsigned position){
