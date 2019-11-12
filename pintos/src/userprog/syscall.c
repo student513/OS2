@@ -143,18 +143,25 @@ void halt(void){
 }
 
 void exit(int status){
+  int idx=3;
   struct thread *current_t = thread_current();
   current_t -> exit_status = status;//success.  (nonzero == fail to exit)
   printf("%s: exit(%d)\n", thread_name(), status);
+  while(idx<128){
+      if(current_t->fd[idx])
+        close(idx);
+      idx++;
+  }
+
   thread_exit();
 }
-int write(int fd, const void *buffer, unsigned size){
+int write(int fd, const void *buffer, unsigned size){//11.12 수정필요
   if(fd == 1){
     putbuf(buffer,size);
   }
   return (int)size;
 }
-int read(int fd, void* buffer, unsigned size){
+int read(int fd, void* buffer, unsigned size){//11.12 수정필요
   int i=0;
   uint8_t check;
   if(fd ==0){
@@ -202,14 +209,39 @@ bool create (const char *file, unsigned initial_size){
   return filesys_create(file,initial_size);
 }
 bool remove (const char *file){
+  /* 11.12 삭제예정
   if(!file)
     exit(-1);
   if(!is_user_vaddr(file))
     exit(-1);
+  */
   return filesys_remove(file);
 }
 int open (const char *file){
+  struct file* fp;
+  int ret =-1;
+  int idx =3;
 
+  if(!file) //open-null
+    exit(-1);
+  if(!is_user_vaddr(file))//open-bad-ptr
+    exit(-1);
+  fp = filesys_open(file);
+  if(fp==NULL){//open-empty
+    return ret; //수정합시다. inseok
+  }
+  else{//open normal
+    idx = 3;
+    while(idx<128){
+      if(thread_current()->fd[idx]==NULL)
+      break;
+      idx++;
+    }
+    thread_current()->fd[idx] = fp;
+    return idx; //return fd
+  }
+
+  return -1;
 }
 int filesize (int fd){
   if(thread_current()->fd[fd]){
@@ -222,12 +254,33 @@ int filesize (int fd){
   
 }
 void seek (int fd, unsigned position){
-
+  
+  if(thread_current()->fd[fd]){
+    file_seek(thread_current()->fd[fd],position);
+  }
+  else
+  {
+    exit(-1);
+  }
 }
 unsigned tell (int fd){
-
+  
+  if(thread_current()->fd[fd]){
+    return file_tell(thread_current()->fd[fd]);
+  }
+  else
+  {
+    exit(-1);
+  }
 }
 void close (int fd){
-
+  
+  if(thread_current()->fd[fd]){
+    return file_close(thread_current()->fd[fd]);
+  }
+  else
+  {
+    exit(-1);
+  }
 }
 /**/
