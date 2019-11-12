@@ -194,10 +194,10 @@ int sum(int a, int b, int c, int d){//Return the sum of a, b, c and d
 
 //11.12 형준
 bool create (const char *file, unsigned initial_size){
-
+  return filesys_create(file,initial_size);
 }
 bool remove (const char *file){
-
+  return filesys_remove(file);
 }
 int open (const char *file){
 
