@@ -489,7 +489,7 @@ init_thread (struct thread *t, const char *name, int priority)
   #ifdef USERPROG
   /*20191112 inseok : */
   for(i=0;i<128;i++){//init
-    fd[i] = NULL;
+    t->fd[i] = NULL;
   }
   /**/
   /*1102 수정해야할 곳*/
