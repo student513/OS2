@@ -106,6 +106,9 @@ struct thread
     struct list_elem child_elem;
     struct semaphore temp_lock;
     //
+    /*20191112 inseok : add fd*/
+    struct file * fd[128];
+    /**/
 #endif
     
     /* Owned by thread.c. */

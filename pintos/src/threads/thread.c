@@ -482,14 +482,19 @@ init_thread (struct thread *t, const char *name, int priority)
   부모스레드가 생성되면 자식스레드도 자동으로 생성되어야하며, 그러므로
   sema_init도 되어야한다. running_thread p는 무엇?
   */
-  /*1102 수정해야할 곳*/
+  
   #ifdef USERPROG
+  /*20191112 inseok : */
+
+  /**/
+  /*1102 수정해야할 곳*/
   sema_init(&(t->current_lock), 0);  
   sema_init(&(t->temp_lock), 0);      
   list_init(&(t->child));
   list_push_back(&(running_thread()->child), &(t->child_elem));
-  #endif  
   /* */
+  #endif  
+  
 }
 
 /* Allocates a SIZE-byte frame at the top of thread T's stack and
