@@ -194,16 +194,24 @@ int sum(int a, int b, int c, int d){//Return the sum of a, b, c and d
 
 //11.12 형준
 bool create (const char *file, unsigned initial_size){
+  if(!file)
+    exit(-1);
+  if(!is_user_vaddr(file))
+    exit(-1);
   return filesys_create(file,initial_size);
 }
 bool remove (const char *file){
+  if(!file)
+    exit(-1);
+  if(!is_user_vaddr(file))
+    exit(-1);
   return filesys_remove(file);
 }
 int open (const char *file){
 
 }
 int filesize (int fd){
-
+  
 }
 void seek (int fd, unsigned position){
 
