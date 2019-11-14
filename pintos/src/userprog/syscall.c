@@ -156,6 +156,7 @@ void exit(int status){
   thread_exit();
 }
 int write(int fd, const void *buffer, unsigned size){//11.12 수정필요 // 11.14 수정 형준
+
   if(!is_user_vaddr(buffer))
     exit(-1);
   if(fd>=3){
@@ -170,13 +171,9 @@ int write(int fd, const void *buffer, unsigned size){//11.12 수정필요 // 11.
     putbuf(buffer, size);
     return size;
   }
-  /*
-  if(fd == 1){
-    putbuf(buffer,size);
-  }
-  return (int)size;
-  */
+
  return -1;
+ 
 }
 int read(int fd, void* buffer, unsigned size){//11.12 수정필요 // 11.14 if 추가
   int i=0;
@@ -192,7 +189,7 @@ int read(int fd, void* buffer, unsigned size){//11.12 수정필요 // 11.14 if �
       exit(-1);
     }
   }
-  else if(!fd){
+  else if(fd==0){
     for(i=0;i<(int)size;i++){
       check = input_getc();
       if(!check) break;
