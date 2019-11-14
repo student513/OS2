@@ -211,9 +211,9 @@ int sum(int a, int b, int c, int d){//Return the sum of a, b, c and d
 /*PRJ2*/
 //11.12 형준
 bool create (const char *file, unsigned initial_size){
-  if(!file)
+  if(!file) //create-null
     exit(-1);
-  if(!is_user_vaddr(file))
+  if(!is_user_vaddr(file))//create-bad-ptr
     exit(-1);
   return filesys_create(file,initial_size);
 }
@@ -253,40 +253,49 @@ int open (const char *file){
   return -1;
 }
 int filesize (int fd){
+  return file_length(thread_current()->fd[fd]);
+  /*
   if(thread_current()->fd[fd]){
     return file_length(thread_current()->fd[fd]);
   }
   else
   {
     exit(-1);
-  }
+  }*/
   
 }
 void seek (int fd, unsigned position){
-  if(thread_current()->fd[fd]){
+  file_seek(thread_current()->fd[fd],position);
+  /*
+  if(thread_current()->fd[fd]){//있으면
     file_seek(thread_current()->fd[fd],position);
   }
   else
   {
     exit(-1);
-  }
+  }*/
 }
 unsigned tell (int fd){
-  if(thread_current()->fd[fd]){
+  return file_tell(thread_current()->fd[fd]);
+  /*
+  if(thread_current()->fd[fd]){//있으면
     return file_tell(thread_current()->fd[fd]);
   }
   else
   {
     exit(-1);
-  }
+  }*/
 }
 void close (int fd){
+  return file_close(thread_current()->fd[fd]);
+  /*
   if(thread_current()->fd[fd]){
     return file_close(thread_current()->fd[fd]);
   }
   else
   {
     exit(-1);
-  }
+  }*/
+
 }
-/**/
+/*PRJ2 done*/
