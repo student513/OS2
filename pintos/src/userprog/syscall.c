@@ -161,22 +161,22 @@ int write(int fd, const void *buffer, unsigned size){//11.12 수정필요
   }
   return (int)size;
 }
-int read(int fd, void* buffer, unsigned size){//11.12 수정필요
+int read(int fd, void* buffer, unsigned size){//11.12 수정필요 // 11.14 if 추가
   int i=0;
   uint8_t check;
-  if(fd ==0){
-    for(i=0;i<(int)size;i++){
-      check = input_getc();
-      if(!check) break;
-    }
-  }
-  else if(fd>=3){
+  if(fd>=3){
     if(thread_current()->fd[fd]){
       return file_read(thread_current()->fd[fd],buffer,size);
     }
     else
     {
       exit(-1);
+    }
+  }
+  else if(!fd){
+    for(i=0;i<(int)size;i++){
+      check = input_getc();
+      if(!check) break;
     }
   }
 }
