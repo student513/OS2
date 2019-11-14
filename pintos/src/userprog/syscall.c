@@ -244,43 +244,49 @@ int open (const char *file){
   return -1;
 }
 int filesize (int fd){
+  return file_length(thread_current()->fd[fd]);
+  /*
   if(thread_current()->fd[fd]){
     return file_length(thread_current()->fd[fd]);
   }
   else
   {
     exit(-1);
-  }
+  }*/
   
 }
 void seek (int fd, unsigned position){
-  
-  if(thread_current()->fd[fd]){
+  file_seek(thread_current()->fd[fd],position);
+  /*
+  if(thread_current()->fd[fd]){//있으면
     file_seek(thread_current()->fd[fd],position);
   }
   else
   {
     exit(-1);
-  }
+  }*/
 }
 unsigned tell (int fd){
-  
-  if(thread_current()->fd[fd]){
+  return file_tell(thread_current()->fd[fd]);
+  /*
+  if(thread_current()->fd[fd]){//있으면
     return file_tell(thread_current()->fd[fd]);
   }
   else
   {
     exit(-1);
-  }
+  }*/
 }
 void close (int fd){
-  
+  return file_close(thread_current()->fd[fd]);
+  /*
   if(thread_current()->fd[fd]){
     return file_close(thread_current()->fd[fd]);
   }
   else
   {
     exit(-1);
-  }
+  }*/
+
 }
-/**/
+/*PRJ2 done*/
