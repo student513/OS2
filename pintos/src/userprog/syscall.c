@@ -147,27 +147,46 @@ void exit(int status){
   struct thread *current_t = thread_current();
   current_t -> exit_status = status;//success.  (nonzero == fail to exit)
   printf("%s: exit(%d)\n", thread_name(), status);
+
+ 
   while(idx<128){
-      if(current_t->fd[idx])
+      if(current_t->fd[idx] !=NULL) //20191114 fd 값이 0일떄안되는듯!!
         close(idx);
       idx++;
   }
-
+  
   thread_exit();
 }
-int write(int fd, const void *buffer, unsigned size){//11.12 수정필요
+int write(int fd, const void *buffer, unsigned size){//11.12 수정필요 // 11.14 수정 형준
+  if(!is_user_vaddr(buffer))
+    exit(-1);
+  if(fd>=3){
+    if(thread_current()->fd[fd] != NULL)
+      return file_write(thread_current()->fd[fd],buffer,size);
+    else
+    {
+      exit(-1);
+    }
+  }
+  else if(fd==1){
+    putbuf(buffer, size);
+    return size;
+  }
+  /*
   if(fd == 1){
     putbuf(buffer,size);
   }
   return (int)size;
+  */
+ return -1;
 }
 int read(int fd, void* buffer, unsigned size){//11.12 수정필요 // 11.14 if 추가
   int i=0;
   uint8_t check;
-  if(!is_user_vaddr(buffer))//test/read-bad-ptr
+  if(!is_user_vaddr(buffer)) //test/read-bad-ptr
     exit(-1);
   if(fd>=3){
-    if(thread_current()->fd[fd]){
+    if(thread_current()->fd[fd] != NULL){
       return file_read(thread_current()->fd[fd],buffer,size);
     }
     else
@@ -175,12 +194,21 @@ int read(int fd, void* buffer, unsigned size){//11.12 수정필요 // 11.14 if �
       exit(-1);
     }
   }
-  else if(!fd){
+  else if(fd==0){
+    for (i = 0; i < size; i ++) {
+      if (((char *)buffer)[i] == '\0') {
+        break;
+      }
+    }
+    return i;
+    /*
     for(i=0;i<(int)size;i++){
       check = input_getc();
       if(!check) break;
     }
+    return i;//11.14 밖으로 빼야할까? 형준*/
   }
+  
 }
 int wait(pid_t pid){
   return process_wait(pid);
@@ -220,12 +248,12 @@ bool create (const char *file, unsigned initial_size){
   return filesys_create(file,initial_size);
 }
 bool remove (const char *file){
-  /* 11.12 삭제예정
+  //11.12 삭제예정
   if(!file)
     exit(-1);
   if(!is_user_vaddr(file))
     exit(-1);
-  */
+  
   return filesys_remove(file);
 }
 int open (const char *file){
@@ -255,49 +283,49 @@ int open (const char *file){
   return -1;
 }
 int filesize (int fd){
-  return file_length(thread_current()->fd[fd]);
-  /*
-  if(thread_current()->fd[fd]){
+  //return file_length(thread_current()->fd[fd]);
+  
+  if(thread_current()->fd[fd] != NULL){
     return file_length(thread_current()->fd[fd]);
   }
   else
   {
     exit(-1);
-  }*/
+  }
   
 }
 void seek (int fd, unsigned position){
-  file_seek(thread_current()->fd[fd],position);
-  /*
-  if(thread_current()->fd[fd]){//있으면
+  //file_seek(thread_current()->fd[fd],position);
+  
+  if(thread_current()->fd[fd] !=NULL){//있으면
     file_seek(thread_current()->fd[fd],position);
   }
   else
   {
     exit(-1);
-  }*/
+  }
 }
 unsigned tell (int fd){
-  return file_tell(thread_current()->fd[fd]);
-  /*
-  if(thread_current()->fd[fd]){//있으면
+  //return file_tell(thread_current()->fd[fd]);
+  
+  if(thread_current()->fd[fd] != NULL){//있으면
     return file_tell(thread_current()->fd[fd]);
   }
   else
   {
     exit(-1);
-  }*/
+  }
 }
 void close (int fd){
-  return file_close(thread_current()->fd[fd]);
-  /*
-  if(thread_current()->fd[fd]){
+  //return file_close(thread_current()->fd[fd]);
+  
+  if(thread_current()->fd[fd] !=NULL){
     return file_close(thread_current()->fd[fd]);
   }
   else
   {
     exit(-1);
-  }*/
+  }
 
 }
 /*PRJ2 done*/
