@@ -170,6 +170,15 @@ int read(int fd, void* buffer, unsigned size){//11.12 수정필요
       if(!check) break;
     }
   }
+  else if(fd>=3){
+    if(thread_current()->fd[fd]){
+      return file_read(thread_current()->fd[fd],buffer,size);
+    }
+    else
+    {
+      exit(-1);
+    }
+  }
 }
 int wait(pid_t pid){
   return process_wait(pid);
@@ -254,7 +263,6 @@ int filesize (int fd){
   
 }
 void seek (int fd, unsigned position){
-  
   if(thread_current()->fd[fd]){
     file_seek(thread_current()->fd[fd],position);
   }
@@ -264,7 +272,6 @@ void seek (int fd, unsigned position){
   }
 }
 unsigned tell (int fd){
-  
   if(thread_current()->fd[fd]){
     return file_tell(thread_current()->fd[fd]);
   }
@@ -274,7 +281,6 @@ unsigned tell (int fd){
   }
 }
 void close (int fd){
-  
   if(thread_current()->fd[fd]){
     return file_close(thread_current()->fd[fd]);
   }
