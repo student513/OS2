@@ -155,15 +155,34 @@ void exit(int status){
 
   thread_exit();
 }
-int write(int fd, const void *buffer, unsigned size){//11.12 수정필요
+int write(int fd, const void *buffer, unsigned size){//11.12 수정필요 // 11.14 수정 형준
+  if(!is_user_vaddr(buffer))
+    exit(-1);
+  if(fd>=3){
+    if(thread_current()->fd[fd])
+      return file_write(thread_current()->fd[fd],buffer,size);
+    else
+    {
+      exit(-1);
+    }
+  }
+  else if(fd==1){
+    putbuf(buffer, size);
+    return size;
+  }
+  /*
   if(fd == 1){
     putbuf(buffer,size);
   }
   return (int)size;
+  */
+ return -1;
 }
 int read(int fd, void* buffer, unsigned size){//11.12 수정필요 // 11.14 if 추가
   int i=0;
   uint8_t check;
+  if(!is_user_vaddr(buffer))
+    exit(-1);
   if(fd>=3){
     if(thread_current()->fd[fd]){
       return file_read(thread_current()->fd[fd],buffer,size);
@@ -178,7 +197,9 @@ int read(int fd, void* buffer, unsigned size){//11.12 수정필요 // 11.14 if �
       check = input_getc();
       if(!check) break;
     }
+    return i;//11.14 밖으로 빼야할까? 형준
   }
+  
 }
 int wait(pid_t pid){
   return process_wait(pid);
