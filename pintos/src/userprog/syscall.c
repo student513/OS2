@@ -248,12 +248,13 @@ bool create (const char *file, unsigned initial_size){
   return filesys_create(file,initial_size);
 }
 bool remove (const char *file){
+  /*
   //11.12 삭제예정
   if(!file)
     exit(-1);
   if(!is_user_vaddr(file))
     exit(-1);
-  
+  */
   return filesys_remove(file);
 }
 int open (const char *file){
@@ -317,8 +318,16 @@ unsigned tell (int fd){
   }
 }
 void close (int fd){
+  //20191114 : 수정
+  struct file* fp;
+  if (thread_current()->fd[fd] == NULL) {
+    exit(-1);
+  }
+  fp = thread_current()->fd[fd];
+  thread_current()->fd[fd] = NULL;
+  return file_close(fp);
   //return file_close(thread_current()->fd[fd]);
-  
+  /*
   if(thread_current()->fd[fd] !=NULL){
     return file_close(thread_current()->fd[fd]);
   }
@@ -326,6 +335,7 @@ void close (int fd){
   {
     exit(-1);
   }
+  */
 
 }
 /*PRJ2 done*/
