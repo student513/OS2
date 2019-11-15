@@ -152,7 +152,7 @@ page_fault (struct intr_frame *f)
   user = (f->error_code & PF_U) != 0;
    
    /*20191103 inseok */
-  if (!user || is_kernel_vaddr(fault_addr)) exit(-1);//fault_addr?
+  if (!user || is_kernel_vaddr(fault_addr)||fault_addr == NULL) exit(-1);//fault_addr?//20191114inseok modifyed
   /**/
   /* To implement virtual memory, delete the rest of the function
      body, and replace it with code that brings in the page to
