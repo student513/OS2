@@ -9,7 +9,6 @@
 #include "threads/vaddr.h"
 /**/
 
-<<<<<<< HEAD
 /*20191115 PRJ2*/
 #include "filesys/off_t.h"
 
@@ -23,8 +22,6 @@ struct file
 
 struct lock open_lock;
 /**/
-=======
->>>>>>> fb08db69cbbbaea79f22606be59d4b62a50fa619
 static void syscall_handler (struct intr_frame *);
 
 void
@@ -178,40 +175,32 @@ void exit(int status){
   thread_exit();
 }
 int write(int fd, const void *buffer, unsigned size){//11.12 수정필요 // 11.14 수정 형준
-<<<<<<< HEAD
   int ret = -1;
   lock_acquire(&open_lock);
   if(!is_user_vaddr(buffer)){
     lock_release(&open_lock);
     exit(-1);  
   }
-=======
-
-  if(!is_user_vaddr(buffer))
-    exit(-1);
->>>>>>> fb08db69cbbbaea79f22606be59d4b62a50fa619
   if(fd>=3){
-    if(thread_current()->fd[fd] != NULL)
+    /*
+    if (thread_current()->fd[fd]->deny_write) {
+        file_deny_write(thread_current()->fd[fd]);
+    }*/
+    if(thread_current()->fd[fd] != NULL){
       ret = file_write(thread_current()->fd[fd],buffer,size);
+    }
     else
     {
-
+      lock_release(&open_lock);
       exit(-1);
     }
   }
   else if(fd==1){
     putbuf(buffer, size);
-<<<<<<< HEAD
     ret =  size;
   }
   lock_release(&open_lock);
   return ret;
-=======
-    return size;
-  }
- return -1;
-
->>>>>>> fb08db69cbbbaea79f22606be59d4b62a50fa619
 }
 int read(int fd, void* buffer, unsigned size){//11.12 수정필요 // 11.14 if 추가
   int ret =-1;
@@ -308,41 +297,24 @@ int open (const char *file){
   }
   else{//open normal
     idx = 3;
-    /*
+    
     while(idx<128){
       if(thread_current()->fd[idx]==NULL){
         if (strcmp(thread_current()->name, file) == 0) {
             file_deny_write(fp);
-
         }  
         break;
       }
       idx++;
     }
-<<<<<<< HEAD
     thread_current()->fd[idx] = fp;
     ret = idx; //return fd
 
-    
+
 
   }
   lock_release(&open_lock);
   return ret;
-=======
-    */
-    while(idx<128){
-      if(thread_current()->fd[idx]==NULL){
-        if (strcmp(thread_current()->name, file) == 0) {
-            file_deny_write(fp);
-        }
-        thread_current()->fd[idx] = fp;
-        return idx; //return fd 
-      }
-      idx++;
-    }
-  }
-  return -1;
->>>>>>> fb08db69cbbbaea79f22606be59d4b62a50fa619
 }
 int filesize (int fd){
   //return file_length(thread_current()->fd[fd]);
@@ -381,21 +353,13 @@ unsigned tell (int fd){
 void close (int fd){
   //20191114 : 수정
   struct file* fp;
-<<<<<<< HEAD
   
   if(thread_current()->fd[fd] != NULL) {
-=======
-  if (thread_current()->fd[fd] != NULL) {
->>>>>>> fb08db69cbbbaea79f22606be59d4b62a50fa619
     fp = thread_current()->fd[fd];
     thread_current()->fd[fd] = NULL;
     return file_close(fp);
   }
-<<<<<<< HEAD
   else{//abnormal
-=======
-  else{
->>>>>>> fb08db69cbbbaea79f22606be59d4b62a50fa619
     exit(-1);
   }
   //return file_close(thread_current()->fd[fd]);
