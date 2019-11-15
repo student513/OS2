@@ -8,6 +8,7 @@
 /*20191103 inseok : header included*/
 #include "threads/vaddr.h"
 /**/
+
 static void syscall_handler (struct intr_frame *);
 
 void
@@ -173,9 +174,8 @@ int write(int fd, const void *buffer, unsigned size){//11.12 수정필요 // 11.
     putbuf(buffer, size);
     return size;
   }
-
  return -1;
- 
+
 }
 int read(int fd, void* buffer, unsigned size){//11.12 수정필요 // 11.14 if 추가
   int i=0;
@@ -245,12 +245,13 @@ bool create (const char *file, unsigned initial_size){
   return filesys_create(file,initial_size);
 }
 bool remove (const char *file){
+  /*
   //11.12 삭제예정
   if(!file)
     exit(-1);
   if(!is_user_vaddr(file))
     exit(-1);
-  
+  */
   return filesys_remove(file);
 }
 int open (const char *file){
@@ -268,15 +269,24 @@ int open (const char *file){
   }
   else{//open normal
     idx = 3;
+    /*
     while(idx<128){
       if(thread_current()->fd[idx]==NULL)
       break;
       idx++;
     }
-    thread_current()->fd[idx] = fp;
-    return idx; //return fd
+    */
+    while(idx<128){
+      if(thread_current()->fd[idx]==NULL){
+        if (strcmp(thread_current()->name, file) == 0) {
+            file_deny_write(fp);
+        }
+        thread_current()->fd[idx] = fp;
+        return idx; //return fd 
+      }
+      idx++;
+    }
   }
-
   return -1;
 }
 int filesize (int fd){
@@ -314,6 +324,16 @@ unsigned tell (int fd){
   }
 }
 void close (int fd){
+  //20191114 : 수정
+  struct file* fp;
+  if (thread_current()->fd[fd] != NULL) {
+    fp = thread_current()->fd[fd];
+    thread_current()->fd[fd] = NULL;
+    return file_close(fp);
+  }
+  else{
+    exit(-1);
+  }
   //return file_close(thread_current()->fd[fd]);
   /*
   if(thread_current()->fd[fd] !=NULL){
@@ -324,12 +344,5 @@ void close (int fd){
     exit(-1);
   }
   */
- struct file* fp;
-  if (thread_current()->fd[fd] == NULL) {
-    exit(-1);
-  }
-  fp = thread_current()->fd[fd];
-  thread_current()->fd[fd] = NULL;
-  return file_close(fp);
 }
 /*PRJ2 done*/
