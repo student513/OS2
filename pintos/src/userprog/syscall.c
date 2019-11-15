@@ -10,12 +10,27 @@
 /**/
 #include "threads/synch.h"
 
+/*20191115 PRJ2*/
+#include "filesys/off_t.h"
+
+struct file
+  {
+    struct inode *inode;        /* File's inode. */
+    off_t pos;                  /* Current position. */
+    bool deny_write;            /* Has file_deny_write() been called? */
+  };
+
+
+struct lock open_lock;
+/**/
 static void syscall_handler (struct intr_frame *);
 struct lock lock_file;//11.15 형준
 void
 syscall_init (void) 
 {
-  lock_init(&lock_file);
+  /*20191115 PRJ inseok */
+  lock_init(&open_lock);
+  /**/
   intr_register_int (0x30, 3, INTR_ON, syscall_handler, "syscall");
 }
 
@@ -161,35 +176,46 @@ void exit(int status){
   thread_exit();
 }
 int write(int fd, const void *buffer, unsigned size){//11.12 수정필요 // 11.14 수정 형준
-  if(!is_user_vaddr(buffer))
-      exit(-1);
-    if(fd>=3){
-      if(thread_current()->fd[fd] != NULL)
-        return file_write(thread_current()->fd[fd],buffer,size);
-      else
-      {
-        exit(-1);
-      }
-    }
-    else if(fd==1){
-      putbuf(buffer, size);
-      return size;
-    }
-  return -1;
-}
-int read(int fd, void* buffer, unsigned size){//11.12 수정필요 // 11.14 if 추가
-  int i=0;
-  uint8_t check;
-  if(!is_user_vaddr(buffer)) //test/read-bad-ptr
-    exit(-1);
-  //lock_acquire(&lock_file);
+int ret = -1;
+  lock_acquire(&open_lock);
+  if(!is_user_vaddr(buffer)){
+    lock_release(&open_lock);
+    exit(-1);  
+  }
   if(fd>=3){
+
     if(thread_current()->fd[fd] != NULL){
-      //lock_release(&filesys_lock);
-      return file_read(thread_current()->fd[fd],buffer,size);
+      ret = file_write(thread_current()->fd[fd],buffer,size);
     }
     else
     {
+      lock_release(&open_lock);
+      exit(-1);
+    }
+  }
+  else if(fd==1){
+    putbuf(buffer, size);
+    ret =  size;
+  }
+  lock_release(&open_lock);
+  return ret;
+}
+int read(int fd, void* buffer, unsigned size){//11.12 수정필요 // 11.14 if 추가
+  int ret =-1;
+  int i=0;
+  uint8_t check;
+  lock_acquire(&open_lock);
+  if(!is_user_vaddr(buffer)){ //test/read-bad-ptr
+    lock_release(&open_lock);
+    exit(-1);
+  }
+  if(fd>=3){
+    if(thread_current()->fd[fd] != NULL){
+      ret = file_read(thread_current()->fd[fd],buffer,size);
+    }
+    else
+    {
+      lock_release(&open_lock);
       exit(-1);
     }
   }
@@ -199,14 +225,10 @@ int read(int fd, void* buffer, unsigned size){//11.12 수정필요 // 11.14 if �
         break;
       }
     }
-    return i;
-    /*
-    for(i=0;i<(int)size;i++){
-      check = input_getc();
-      if(!check) break;
-    }
-    return i;//11.14 밖으로 빼야할까? 형준*/
+    ret = i;
   }
+  lock_release(&open_lock);
+  return ret;
 }
 int wait(pid_t pid){
   return process_wait(pid);
@@ -264,16 +286,24 @@ int open (const char *file){
     exit(-1);
   if(!is_user_vaddr(file))//open-bad-ptr
     exit(-1);
+
+  lock_acquire(&open_lock);
+
   fp = filesys_open(file);
   if(fp==NULL){//open-empty
-    return ret; //수정합시다. inseok
+    ret=-1; //수정합시다. inseok
   }
   else{//open normal
     idx = 3;
     /*
     while(idx<128){
-      if(thread_current()->fd[idx]==NULL)
-      break;
+      if(thread_current()->fd[idx]==NULL){
+        if (strcmp(thread_current()->name, file) == 0) {
+            file_deny_write(fp);
+
+        }  
+        break;
+      }
       idx++;
     }
     */
