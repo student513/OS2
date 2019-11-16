@@ -262,13 +262,12 @@ bool create (const char *file, unsigned initial_size){
   return filesys_create(file,initial_size);
 }
 bool remove (const char *file){
-  /*
-  //11.12 삭제예정
+ //삭제예정
   if(!file)
     exit(-1);
   if(!is_user_vaddr(file))
     exit(-1);
-  */
+  
   return filesys_remove(file);
 }
 int open (const char *file){

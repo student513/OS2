@@ -111,7 +111,7 @@ start_process (void *file_name_)
   /* If load failed, quit. */
   palloc_free_page (file_name);
   sema_up((&thread_current()->parent->sema_load));
-  if (!success) 
+  if (!success)  //exit(-1);
     thread_exit ();
 
   /* Start the user process by simulating a return from an
