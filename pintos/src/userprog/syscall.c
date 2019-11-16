@@ -8,6 +8,7 @@
 /*20191103 inseok : header included*/
 #include "threads/vaddr.h"
 /**/
+#include "threads/synch.h"
 
 /*20191115 PRJ2*/
 #include "filesys/off_t.h"
@@ -24,7 +25,7 @@ struct file
 struct lock open_lock;
 /**/
 static void syscall_handler (struct intr_frame *);
-
+struct lock lock_file;//11.15 형준
 void
 syscall_init (void) 
 {
