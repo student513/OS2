@@ -109,6 +109,18 @@ struct thread
     /*20191112 inseok : add fd*/
     struct file * fd[128];
     /**/
+    /*20191116 inseok's birthday happy해서 자세하게 설명함*/
+    /*init. start_process process execute
+      parent 쓰레드가 'process execute' 할때 child thread가 생성되면서 child 에서 start_process 가 수행된다.
+      근데 그때 child thread 의 start_process 보다 parent thread 의 process_execute 가 너무 많이 실행되어서 끝나 child 의  load 가 실패해도 이를 모르게 된다. 
+      그래서 child 가 load 가 끝날떄 까지 이를 기다려 줘야 한다. 
+      parent thread 의 process_execute 에서 thread_create 하고 바로 sema_down 해서 wait하고 
+      child thread 의 start_process 에서 load 끝날떄쯤에 부모의 sema_up 을 해주면 된다.
+    */
+    struct thread* parent;
+    struct semaphore sema_load;
+
+    /**/
 #endif
     
     /* Owned by thread.c. */

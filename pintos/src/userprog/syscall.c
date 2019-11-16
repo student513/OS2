@@ -11,16 +11,6 @@
 #include "threads/synch.h"
 
 /*20191115 PRJ2*/
-#include "filesys/off_t.h"
-
-
-struct file
-  {
-    struct inode *inode;        /* File's inode. */
-    off_t pos;                  /* Current position. */
-    bool deny_write;            /* Has file_deny_write() been called? */
-  };
-
 
 struct lock open_lock;
 /**/

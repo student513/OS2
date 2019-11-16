@@ -186,7 +186,7 @@ thread_create (const char *name, int priority,
   /* Initialize thread. */
   init_thread (t, name, priority);//temp_file_name,PRI_DEFAULT
   tid = t->tid = allocate_tid ();
-
+  t->parent = thread_current();
   /* Prepare thread for first run by initializing its stack.
      Do this atomically so intermediate values for the 'stack' 
      member cannot be observed. */
@@ -494,10 +494,13 @@ init_thread (struct thread *t, const char *name, int priority)
   /**/
   /*1102 수정해야할 곳*/
   sema_init(&(t->current_lock), 0);  
-  sema_init(&(t->temp_lock), 0);      
+  sema_init(&(t->temp_lock), 0);       
   list_init(&(t->child));
   list_push_back(&(running_thread()->child), &(t->child_elem));
   /* */
+  /*20191116 init*/
+  sema_init(&(t->sema_load), 0);   
+  /**/ 
   #endif  
   
 }
