@@ -129,7 +129,7 @@ main (int argc, char *argv[])
       /* Spawn a child that will be abnormally terminated.
          To speed the test up, do this only for processes
          spawned at a certain depth. */
-      if (n > EXPECTED_DEPTH_TO_PASS/2)
+      if (n > EXPECTED_DEPTH_TO_PASS/2) //inseok :: if certain depth..
         {
           child_pid = spawn_child (n + 1, CRASH);
           if (child_pid != -1)

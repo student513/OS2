@@ -34,7 +34,10 @@ process_execute (const char *file_name)
   
   char *fn_copy;
   tid_t tid;
-  
+  /*PRJ2 20191117*/
+  struct thread * t;
+  struct list_elem* e;
+  /**/
   /*형준 10.31*/
   char* token=NULL;
   char temp_file_name[strlen(file_name)+1];
@@ -64,6 +67,15 @@ process_execute (const char *file_name)
   
   if (tid == TID_ERROR)
     palloc_free_page (fn_copy); 
+    
+  /* 20191117 inseok */
+  for (e = list_begin(&thread_current()->child); e != list_end(&thread_current()->child); e = list_next(e)) {
+    t = list_entry(e, struct thread, child_elem);
+      if (t->exit_status == -1) {
+        return process_wait(tid);
+      }
+  }
+  /**/
 
   return tid;
   
@@ -111,8 +123,8 @@ start_process (void *file_name_)
   /* If load failed, quit. */
   palloc_free_page (file_name);
   sema_up((&thread_current()->parent->sema_load));
-  if (!success)  //exit(-1);
-    thread_exit ();
+  if (!success)  exit(-1);
+    //thread_exit ();
 
   /* Start the user process by simulating a return from an
      interrupt, implemented by intr_exit (in
