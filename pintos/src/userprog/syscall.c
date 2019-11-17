@@ -262,12 +262,9 @@ bool create (const char *file, unsigned initial_size){
   return filesys_create(file,initial_size);
 }
 bool remove (const char *file){
- //삭제예정
-  if(!file)
-    exit(-1);
-  if(!is_user_vaddr(file))
-    exit(-1);
-  
+ /* 1112삭제예정
+ if(!file)exit(-1);
+  if(!is_user_vaddr(file))exit(-1);*/
   return filesys_remove(file);
 }
 int open (const char *file){
@@ -353,15 +350,6 @@ void close (int fd){
   else{//abnormal
     exit(-1);
   }
-  //return file_close(thread_current()->fd[fd]);
-  /*
-  if(thread_current()->fd[fd] !=NULL){
-    return file_close(thread_current()->fd[fd]);
-  }
-  else
-  {
-    exit(-1);
-  }
-  */
+  
 }
 /*PRJ2 done*/

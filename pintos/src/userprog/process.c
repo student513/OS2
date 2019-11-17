@@ -69,11 +69,14 @@ process_execute (const char *file_name)
     palloc_free_page (fn_copy); 
     
   /* 20191117 inseok */
-  for (e = list_begin(&thread_current()->child); e != list_end(&thread_current()->child); e = list_next(e)) {
+  //실패한 process 회수
+  e = list_begin(&thread_current()->child);
+  while(e != list_end(&thread_current()->child)){
     t = list_entry(e, struct thread, child_elem);
       if (t->exit_status == -1) {
         return process_wait(tid);
       }
+    e = list_next(e);
   }
   /**/
 
